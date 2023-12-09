@@ -1,17 +1,6 @@
 <?php
-$con = mysqli_connect('localhost','midoanawr','s1f4y5l1','win');
-if (!$con) {
-  echo 'fail' . mysqli_connect_error();
-}else{
+include './inc/form.php';
 
-
-}
-if (isset($_POST['submit'])) {
-    $firstname = $_POST['firstName'];
-    $lastName = $_POST['lastName'];
-    $email = $_POST['email'];
-    echo $firstname . $lastName . $email;
-}
 ?>
 
 <!DOCTYPE html>
@@ -26,13 +15,18 @@ if (isset($_POST['submit'])) {
 
 <body>
 
-    <form action="index.php" method="post">
+    <form action="./inc/form.php" method="POST" enctype="multipart/form-data">
         <input type="text" name="firstName" id="firstName" placeholder="First Name">
         <input type="text" name="lastName" id="lastName" placeholder="Last Name">
         <input type="text" name="email" id="email" placeholder="Email">
         <input type="submit" value="Send" name="submit">
     </form>
-
+    <pre>
+    <?php
+    $users = new SqlQeuaries();
+    var_dump($users->SelectQuery());
+    ?>
+</pre>
     <script src="./js/script.js"></script>
 </body>
 

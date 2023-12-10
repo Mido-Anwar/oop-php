@@ -1,8 +1,6 @@
 <?php
-include './inc/form.php';
-
+require './inc/form.php';
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -14,11 +12,10 @@ include './inc/form.php';
 </head>
 
 <body>
-
-    <form action="./inc/form.php" method="POST" enctype="multipart/form-data">
-        <input type="text" name="firstName" id="firstName" placeholder="First Name">
-        <input type="text" name="lastName" id="lastName" placeholder="Last Name">
-        <input type="text" name="email" id="email" placeholder="Email">
+    <form action="./inc/form.php" method="POST">
+        <input type="text" name="firstName" id="">
+        <input type="text" name="lastName" id="">
+        <input type="text" name="email" id="">
         <input type="submit" value="Send" name="submit">
     </form>
     <pre>

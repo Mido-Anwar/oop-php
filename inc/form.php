@@ -23,31 +23,38 @@ class SqlQeuaries extends Connection
     protected $lastName;
     protected $email;
 
-    
-    public function SetInputData($firstName, $lastName, $email)
-    {
-        $this->firstName = $firstName;
-        $this->lastName =  $lastName;
-        $this->email = $email;
-    }
+
+
     public function GetFirstName()
     {
-        return $this->firstName . '<br>';
+        return $this->firstName;
     }
     public function GetLastName()
     {
-        return $this->lastName . '<br>';
+        return $this->lastName;
     }
     public function GetEmail()
     {
-        return $this->email . '<br>';
+        return $this->email;
+    }
+    public function SetFirstName($firstName)
+    {
+        $this->firstName = $firstName;
+    }
+    public function SetLastName($lastName)
+    {
+        $this->lastName = $lastName;
+    }
+    public function SetEmail($email)
+    {
+        $this->email = $email;
     }
 
     protected function ValidationInputData()
     {
-        if (empty($this->firstName) || empty($this->lastName) || empty($this->email)) {
+        if (empty($this->firstName)  || empty($this->lastName) || empty($this->email)) {
             echo "Please Fill All failds";
-        } elseif (filter_var($this->email, FILTER_VALIDATE_EMAIL)) {
+        } elseif (!filter_var($this->email, FILTER_VALIDATE_EMAIL)) {
             echo "Please write email corrctly";
         } else {
             return true;
@@ -64,23 +71,32 @@ class SqlQeuaries extends Connection
     }
     public function InsertQuery()
     {
-        $sqlInsert  =  "INSERT INTO users (first_name,last_name,email) VALUES ('$this->firstName' ,'$this->lastName', '$this->email')";
+        if ($this->ValidationInputData()) {
+            $sqlInsert  =  "INSERT INTO users (first_name,last_name,email) VALUES ('$this->firstName' ,'$this->lastName', '$this->email')";
+            mysqli_query($this->conn(), $sqlInsert);
+            header('Location: ../index.php');
+        } else {
+            echo "Fail : " . mysqli_error($this->conn());
+        }
     }
 
+    public function DeleteQuery()
+    {
+    }
+
+    public function UpdateQuery()
+    {
+    }
 }
 
-
-
-
-if (isset($_POST['submit'])) {
-    $firstName = isset($_POST['firstName']);
-    $lastName = isset($_POST['lastName']);
-    $email = isset($_POST['email']);
+if (isset($_POST["submit"])) {
+    $firstName = $_POST['firstName'];
+    $lastName = $_POST['lastName'];
+    $email = $_POST['email'];
     $con = new SqlQeuaries();
-    $con->SetInputData($firstName, $lastName, $email);
-    if (mysqli_query($con->conn(), $sqlInsert)) {
-        header('Location:  index.php');
-    } else {
-        echo "Fail : " . mysqli_error($con->conn());
-    }
+    $con->SetFirstName($firstName);
+    $con->SetLastName($lastName);
+    $con->SetEmail($email);
+    $con->InsertQuery();
 }
+

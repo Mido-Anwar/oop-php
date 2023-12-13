@@ -1,15 +1,17 @@
 <?php
+require 'db.php';
 
-class Connection
+class Connection extends Database
 {
-    protected $hestName = 'localhost';
-    protected $user = 'midoanawr';
-    protected $password = 's1f4y5l1';
-    protected $dateBase = 'win';
+
+    protected $hostName = self::DATABASEINFO['serverName'];
+    protected $user = self::DATABASEINFO['userName'];
+    protected $password = self::DATABASEINFO['password'];
+    protected $dateBase = self::DATABASEINFO['databaseName'];
 
     public function conn()
     {
-        $conn = mysqli_connect($this->hestName, $this->user, $this->password, $this->dateBase);
+        $conn = mysqli_connect($this->hostName, $this->user, $this->password, $this->dateBase);
         if (!$conn) {
             echo 'fail' . mysqli_connect_error();
         } else {
@@ -22,7 +24,7 @@ class SqlQeuaries extends Connection
     protected $firstName;
     protected $lastName;
     protected $email;
-
+    protected $id;
 
 
     public function GetFirstName()
@@ -37,6 +39,10 @@ class SqlQeuaries extends Connection
     {
         return $this->email;
     }
+    public function GetId()
+    {
+        return $this->id;
+    }
     public function SetFirstName($firstName)
     {
         $this->firstName = $firstName;
@@ -49,7 +55,10 @@ class SqlQeuaries extends Connection
     {
         $this->email = $email;
     }
-
+    public function SetId($id)
+    {
+        $this->id = $id;
+    }
     protected function ValidationInputData()
     {
         if (empty($this->firstName)  || empty($this->lastName) || empty($this->email)) {
@@ -69,6 +78,15 @@ class SqlQeuaries extends Connection
         mysqli_close($this->conn());
         return $users;
     }
+    public function SelectQueryById()
+    {
+        $sqlSelectById = "SELECT * FROM users WHERE id ="
+            . $this->id;
+        $getedUser = mysqli_query($this->conn(), $sqlSelectById);
+        $user =  mysqli_fetch_assoc($getedUser);
+        mysqli_close($this->conn());
+        return $user;
+    }
     public function InsertQuery()
     {
         if ($this->ValidationInputData()) {
@@ -79,13 +97,24 @@ class SqlQeuaries extends Connection
             echo "Fail : " . mysqli_error($this->conn());
         }
     }
-
-    public function DeleteQuery()
-    {
-    }
-
     public function UpdateQuery()
     {
+        if ($this->ValidationInputData()) {
+            $SqlUpdate = "UPDATE users SET first_name = '$this->firstName' , last_name = '$this->lastName',email = '$this->email' WHERE id = '$this->id'";
+            mysqli_query($this->conn(), $SqlUpdate);
+            header('Location: dashboard.php');
+        } else {
+            echo "Fail : " . mysqli_error($this->conn());
+        }
+    }
+    public function DeleteQuery()
+    {
+        $SqlDelete = 'DELETE FROM users WHERE id =' . $this->id;
+        if (mysqli_query($this->conn(), $SqlDelete)) {
+            header('Location: dashboard.php');
+        } else {
+            echo "Fail : " . mysqli_error($this->conn());
+        }
     }
 }
 
@@ -99,4 +128,21 @@ if (isset($_POST["submit"])) {
     $con->SetEmail($email);
     $con->InsertQuery();
 }
+if (isset($_POST["update"])) {
+    $firstName = $_POST['firstName'];
+    $lastName = $_POST['lastName'];
+    $email = $_POST['email'];
+    $con = new SqlQeuaries();
+    $con->SetId($_POST['id']);
+    $con->SetFirstName($firstName);
+    $con->SetLastName($lastName);
+    $con->SetEmail($email);
+    $con->UpdateQuery();
+}
 
+if (isset($_GET['action']) === 'delete' && $_GET['id'] === filter_var($_GET['id'], FILTER_SANITIZE_NUMBER_INT)) {
+    # code...
+    $con = new SqlQeuaries();
+    $con->SetId($_GET['id']);
+    $con->DeleteQuery();
+}

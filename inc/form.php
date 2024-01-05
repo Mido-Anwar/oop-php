@@ -19,13 +19,15 @@ class Connection extends Database
         }
     }
 }
-class SqlQeuaries extends Connection
+class UserSqlQeuaries extends Connection
 {
     protected $firstName;
     protected $lastName;
     protected $email;
     protected $id;
 
+
+    //? setter and getter____________________________________ 
 
     public function GetFirstName()
     {
@@ -45,20 +47,22 @@ class SqlQeuaries extends Connection
     }
     public function SetFirstName($firstName)
     {
-        $this->firstName = $firstName;
+        // mysqli_real_escape_string($this->conn(), $firstName); for string input to database securty and  javascrirpt scripts
+        $this->firstName = mysqli_real_escape_string($this->conn(), $firstName);
     }
     public function SetLastName($lastName)
     {
-        $this->lastName = $lastName;
+        $this->lastName = mysqli_real_escape_string($this->conn(), $lastName);
     }
     public function SetEmail($email)
     {
-        $this->email = $email;
+        $this->email = mysqli_real_escape_string($this->conn(), $email);
     }
     public function SetId($id)
     {
         $this->id = $id;
     }
+    //* validation inputs data ________________________________________
     protected function ValidationInputData()
     {
         if (empty($this->firstName)  || empty($this->lastName) || empty($this->email)) {
@@ -69,6 +73,7 @@ class SqlQeuaries extends Connection
             return true;
         }
     }
+    //* select all data __________________________________________________
     public  function SelectQuery()
     {
         $sqlSelect = "SELECT * FROM users";
@@ -78,15 +83,19 @@ class SqlQeuaries extends Connection
         mysqli_close($this->conn());
         return $users;
     }
+    //* select  data  by id __________________________________________________
     public function SelectQueryById()
     {
         $sqlSelectById = "SELECT * FROM users WHERE id ="
             . $this->id;
         $getedUser = mysqli_query($this->conn(), $sqlSelectById);
         $user =  mysqli_fetch_assoc($getedUser);
+        mysqli_free_result($getedUser);
         mysqli_close($this->conn());
         return $user;
     }
+    //? insert query __________________________________________________
+
     public function InsertQuery()
     {
         if ($this->ValidationInputData()) {
@@ -97,6 +106,8 @@ class SqlQeuaries extends Connection
             echo "Fail : " . mysqli_error($this->conn());
         }
     }
+    //? update data ___________________________________
+
     public function UpdateQuery()
     {
         if ($this->ValidationInputData()) {
@@ -107,6 +118,7 @@ class SqlQeuaries extends Connection
             echo "Fail : " . mysqli_error($this->conn());
         }
     }
+    //! delete data
     public function DeleteQuery()
     {
         $SqlDelete = 'DELETE FROM users WHERE id =' . $this->id;
@@ -122,7 +134,7 @@ if (isset($_POST["submit"])) {
     $firstName = $_POST['firstName'];
     $lastName = $_POST['lastName'];
     $email = $_POST['email'];
-    $con = new SqlQeuaries();
+    $con = new UserSqlQeuaries();
     $con->SetFirstName($firstName);
     $con->SetLastName($lastName);
     $con->SetEmail($email);
@@ -132,7 +144,7 @@ if (isset($_POST["update"])) {
     $firstName = $_POST['firstName'];
     $lastName = $_POST['lastName'];
     $email = $_POST['email'];
-    $con = new SqlQeuaries();
+    $con = new UserSqlQeuaries();
     $con->SetId($_POST['id']);
     $con->SetFirstName($firstName);
     $con->SetLastName($lastName);
@@ -142,7 +154,7 @@ if (isset($_POST["update"])) {
 
 if (isset($_GET['action']) === 'delete' && $_GET['id'] === filter_var($_GET['id'], FILTER_SANITIZE_NUMBER_INT)) {
     # code...
-    $con = new SqlQeuaries();
+    $con = new UserSqlQeuaries();
     $con->SetId($_GET['id']);
     $con->DeleteQuery();
 }

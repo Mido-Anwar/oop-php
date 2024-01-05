@@ -1,10 +1,7 @@
 <?php
-include 'inc/form.php';
-/**
- *first fill database information in db file in inc folder
- */
+include '../inc/form.php';
 //* select by id;
-$user = new SqlQeuaries();
+$user = new UserSqlQeuaries();
 $user->SetId($_GET['id']);
 $user->SelectQueryById();
 ?>
@@ -19,9 +16,8 @@ $user->SelectQueryById();
 </head>
 
 <body style="background-color: green;">
-    <a href="../inc/dashboard.php">Dashboard</a>
-
-    <form action="../inc/form.php" method="POST">
+    <a href="dashboard.php">Dashboard</a>
+    <form action="./inc/form.php" method="POST">
         <input type="text" name="firstName" id="" value="<?= $user->SelectQueryById()['first_name'] ?>">
         <input type="text" value="<?= $_GET['action'] ?>" name="action" hidden>
         <input type="text" value="<?= $user->SelectQueryById()['id'] ?>" name="id" hidden>
